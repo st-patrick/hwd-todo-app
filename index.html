@@ -39,7 +39,34 @@
 
     <div class="container mt-3 mb-5">
         <div class="row">
-            <div class="col-12 col-md-10 offset-md-1 col-lg-8 offset-lg-2 col-xl-6 offset-xl-3 col-xxl-4 offset-xxl-4">
+            <div class="d-none d-lg-block col-lg-6 col-xxl-4 text-center">
+                <h3>Projects</h3>
+                <div>
+                    <input class="form-control mb-2 project-input" type="text">
+                    <input class="form-control mb-2 project-input" type="text">
+                    <input class="form-control mb-2 project-input" type="text">
+                    <input class="form-control mb-2 project-input" type="text">
+                    <input class="form-control mb-2 project-input" type="text">
+                </div>
+                <div class="mb-2 text-center">
+                    <button class="text-center btn btn-lg btn-primary fw-bold pb-3" onclick=" saveDizBitch();">save</button>
+                    <button class="text-center btn btn-lg btn-primary fw-bold pb-3" onclick="addTodo();">new</button>
+                    <button class="text-center btn btn-lg btn-primary fw-bold pb-3" onclick="sortTodos();">sort</button>
+                </div>
+                <br>
+                <div class="text-center fw-bold" style="color: white;">
+                    0
+                </div>
+                <br>
+                <div class="">
+                    hwd DONE something...
+                </div>
+                <div class="text-center fw-bold" style="color: white;">
+                    0
+                </div>
+            </div>
+            <div class="col-12 offset-md-1 col-md-10 offset-lg-0 col-lg-6 col-xxl-4 text-center">
+                <h3>ToDos</h3>
                 <div id="list">
                     <input class="form-control mb-2 todo-input" type="text">
                     <input class="form-control mb-2 todo-input" type="text">
@@ -49,14 +76,19 @@
                     <input class="form-control mb-2 todo-input" type="text">
                 </div>
                 <div class="mb-2 text-center">
-                    <button class="text-center btn btn-lg btn-primary fw-bold pb-3" onclick=" saveDizBitch();">save</button>
+                    <button class="text-center btn btn-lg btn-primary fw-bold pb-3" onclick="saveDataFrom('todos');">save</button>
                     <button class="text-center btn btn-lg btn-primary fw-bold pb-3" onclick="addTodo();">new</button>
                     <button class="text-center btn btn-lg btn-primary fw-bold pb-3" onclick="sortTodos();">sort</button>
                 </div>
+                <br>
                 <div class="text-center fw-bold" id="count" style="color: white;">
                     0
                 </div>
+                <br>
                 <div class="" id="done">
+                    hwd DONE something...
+                </div>
+                <div class="text-center fw-bold" id="countDone" style="color: white;">
                     0
                 </div>
             </div>
@@ -77,6 +109,8 @@
 <script>
 
     let globalList = [];
+    let globalTodoCount = 0;
+    let globalDoneCount = 0;
 
     async function getJSONdata() {
         const request = new Request('https://api.npoint.io/09f00b9000d1a3a5902a', {method: 'GET'});
@@ -108,21 +142,17 @@
     async function main() {
         let response = await getJSONdata();
         globalList = response.list;
-
-        sortOnly();
-        updateCount();
+        scoreSortRender();
     }
 
     function sortTodos() {
         getTodosFromInputs();
-        sortOnly();
-        updateCount();
+        scoreSortRender();
     }
 
-    function sortOnly(){
+    function scoreSortRender(){
         scoreTodos();
         globalList = globalList.sort(compareTodoScore);
-
         renderTodos();
     }
 
@@ -139,7 +169,6 @@
         let listDOM = document.getElementById('list');
         let content = "<input class=\"form-control mb-2 todo-input\" type=\"text\" placeholder=\"type here\">";
         listDOM.insertAdjacentHTML('beforeend', content);
-        updateCount();
     }
 
 
@@ -153,17 +182,18 @@
         for(let todo of globalList) {
 
             if (todo.score < 0) {
-                listHTML += "<input class=\"form-control mb-2 todo-input\" type=\"text\" value=\"" + todo + "\" aria-label=\"default input example\">";
+                doneHTML += "<p>" + todo.name + "</p>";
+            } else {
+                listHTML += "<input class=\"form-control mb-2 todo-input\" type=\"text\" value=\"" + todo.name + "\" aria-label=\"default input example\">";
             }
 
         }
 
         listDOM.innerHTML = listHTML;
-    }
+        doneDOM.innerHTML = doneHTML;
 
-    function updateCount(){
-        let count = document.getElementsByClassName('todo-input').length;
-        document.getElementById('count').innerHTML = count;
+        document.getElementById('count').innerHTML = globalTodoCount;
+        document.getElementById('countDone').innerHTML = globalDoneCount;
     }
 
     /*
@@ -171,11 +201,15 @@
      */
     function scoreTodos() {
 
+        globalDoneCount = 0;
+        globalTodoCount = 0;
+
         for(let todo of globalList) {
 
             if(todo.name.includes("DONE")) {
 
                 todo.score = -1;
+                globalDoneCount++;
 
             } else {
 
@@ -194,6 +228,7 @@
                 } else { urgency = 0; }
 
                 todo.score = highImpact + importance + urgency;
+                globalTodoCount++;
 
             }
 
@@ -207,27 +242,38 @@
 
     function getTodosFromInputs() {
         const todoInputs = document.getElementsByClassName("todo-input");
+        const dones = document.getElementById("done").getElementsByTagName("p");
         globalList = [];
         for(let todo of todoInputs) {
             if(todo.value != "") {
                 globalList.push({name: todo.value});
             }
         }
+        for(let done of dones) {
+            if(done.innerHTML != "") {
+                globalList.push({name: done.innerHTML});
+            }
+        }
     }
+    
 
-    async function saveDizBitch() {
-        getTodosFromInputs();
+    async function saveDataFrom(area) {
+        if (area == "todos") {
+            getTodosFromInputs();
 
-        const body = {list: globalList};
-        const bodyJSON = JSON.stringify(body);
+            const body = {list: globalList};
+            const bodyJSON = JSON.stringify(body);
 
-        const request = new Request('https://api.npoint.io/09f00b9000d1a3a5902a', {
-            method: 'POST',
-            body: bodyJSON,
-            headers: {'Authorization': 'Bearer PhKqhyh2LEhtBbRPLABwB7pq'}
-        });
+            const request = new Request('https://api.npoint.io/09f00b9000d1a3a5902a', {
+                method: 'POST',
+                body: bodyJSON,
+                headers: {'Authorization': 'Bearer PhKqhyh2LEhtBbRPLABwB7pq'}
+            });
 
-        thatFetchStuff(request);
+            thatFetchStuff(request);
+        } else if (area == "projects") {
+
+        }
     }
 
     main();
