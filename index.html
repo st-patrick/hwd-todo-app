@@ -76,7 +76,7 @@
                     <input class="form-control mb-2 todo-input" type="text">
                 </div>
                 <div class="mb-2 text-center">
-                    <button class="text-center btn btn-lg btn-primary fw-bold pb-3" onclick="saveDataFrom('todos');">save</button>
+                    <button class="text-center btn btn-lg btn-primary fw-bold pb-3" onclick="saveAll();">save</button>
                     <button class="text-center btn btn-lg btn-primary fw-bold pb-3" onclick="addTodo();">new</button>
                     <button class="text-center btn btn-lg btn-primary fw-bold pb-3" onclick="sortTodos();">sort</button>
                 </div>
@@ -91,6 +91,19 @@
                 <div class="text-center fw-bold" id="countDone" style="color: white;">
                     0
                 </div>
+            </div>
+            <div class="col-12 offset-md-1 col-md-10 offset-lg-0 col-lg-6 col-xxl-4 text-center">
+                <h3>Breakdown</h3>
+                <div id="breakdown-list">
+                    <textarea class="form-control mb-2 breakdown-input" type="text"></textarea>
+                    <textarea class="form-control mb-2 breakdown-input" type="text"></textarea>
+                    <textarea class="form-control mb-2 breakdown-input" type="text"></textarea>
+                    <textarea class="form-control mb-2 breakdown-input" type="text"></textarea>
+                </div>
+                <div class="mb-2 text-center">
+                    <button class="text-center btn btn-lg btn-primary fw-bold pb-3" onclick="addBreakdown();">new</button>
+                </div>
+
             </div>
         </div>
 
@@ -109,6 +122,7 @@
 <script>
 
     let globalList = [];
+    let globalBreakdownList = [];
     let globalTodoCount = 0;
     let globalDoneCount = 0;
 
@@ -142,6 +156,7 @@
     async function main() {
         let response = await getJSONdata();
         globalList = response.list;
+        globalBreakdownList = response.breakdowns;
         scoreSortRender();
     }
 
@@ -153,7 +168,7 @@
     function scoreSortRender(){
         scoreTodos();
         globalList = globalList.sort(compareTodoScore);
-        renderTodos();
+        renderAll();
     }
 
     /* was not really necessary, we now work with the globallist object
@@ -168,6 +183,12 @@
     function addTodo(){
         let listDOM = document.getElementById('list');
         let content = "<input class=\"form-control mb-2 todo-input\" type=\"text\" placeholder=\"type here\">";
+        listDOM.insertAdjacentHTML('beforeend', content);
+    }
+
+    function addBreakdown() {
+        let listDOM = document.getElementById('breakdown-list');
+        let content = "<textarea class=\"form-control mb-2 breakdown-input\" type=\"text\"></textarea>";
         listDOM.insertAdjacentHTML('beforeend', content);
     }
 
@@ -194,6 +215,19 @@
 
         document.getElementById('count').innerHTML = globalTodoCount;
         document.getElementById('countDone').innerHTML = globalDoneCount;
+    }
+
+    async function renderAll() {
+        renderTodos();
+
+        let listDOM = document.getElementById('breakdown-list');
+        let listHTML = "";
+
+        for(let breakdown of globalBreakdownList) {
+            listHTML += "<textarea class=\"form-control mb-2 breakdown-input\" type=\"text\">" + breakdown + "</textarea>";
+        }
+
+        listDOM.innerHTML = listHTML;
     }
 
     /*
@@ -255,6 +289,23 @@
             }
         }
     }
+
+    function getDataFromInputs() {
+        getTodosFromInputs();
+
+        const breakdowns = document.getElementsByClassName("breakdown-input");
+        console.log(breakdowns);
+
+        globalBreakdownList = [];
+
+        for(let breakdown of breakdowns) {
+            if(breakdown.value != "") {
+                globalBreakdownList.push(breakdown.value);
+            }
+        }
+
+        console.log(globalBreakdownList);
+    }
     
 
     async function saveDataFrom(area) {
@@ -274,6 +325,27 @@
         } else if (area == "projects") {
 
         }
+    }
+
+    // saves all data from the app instead of just one area
+    // first, get the data from the html inputs
+    // then, send them as a json object to our storage provider
+    async function saveAll() {
+        getDataFromInputs();
+
+        const body = {
+            list: globalList,
+            breakdowns: globalBreakdownList
+        };
+        const bodyJSON = JSON.stringify(body);
+
+        const request = new Request('https://api.npoint.io/09f00b9000d1a3a5902a', {
+            method: 'POST',
+            body: bodyJSON,
+            headers: {'Authorization': 'Bearer PhKqhyh2LEhtBbRPLABwB7pq'}
+        });
+
+        thatFetchStuff(request);
     }
 
     main();
