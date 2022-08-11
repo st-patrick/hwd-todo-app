@@ -46,7 +46,7 @@
         <div class="row">
             <div class="d-none d-lg-block col-lg-6 col-xxl-4 text-center">
                 <h3>Projects</h3>
-                <div>
+                <div id="project-list">
                     <input class="form-control mb-2 project-input" type="text">
                     <input class="form-control mb-2 project-input" type="text">
                     <input class="form-control mb-2 project-input" type="text">
@@ -54,20 +54,7 @@
                     <input class="form-control mb-2 project-input" type="text">
                 </div>
                 <div class="mb-2 text-center">
-                    <button class="text-center btn btn-lg btn-primary fw-bold pb-3" onclick=" saveDizBitch();">save</button>
-                    <button class="text-center btn btn-lg btn-primary fw-bold pb-3" onclick="addTodo();">new</button>
-                    <button class="text-center btn btn-lg btn-primary fw-bold pb-3" onclick="sortTodos();">sort</button>
-                </div>
-                <br>
-                <div class="text-center fw-bold" style="color: white;">
-                    0
-                </div>
-                <br>
-                <div class="">
-                    hwd DONE something...
-                </div>
-                <div class="text-center fw-bold" style="color: white;">
-                    0
+                    <button class="text-center btn btn-lg btn-primary fw-bold pb-3" onclick="addProject();">new</button>
                 </div>
             </div>
             <div class="col-12 offset-md-1 col-md-10 offset-lg-0 col-lg-6 col-xxl-4 text-center">
@@ -126,6 +113,7 @@
 
     let globalList = [];
     let globalBreakdownList = [];
+    let globalProjectList = [];
     let globalTodoCount = 0;
     let globalDoneCount = 0;
 
@@ -192,6 +180,12 @@
     function addBreakdown() {
         let listDOM = document.getElementById('breakdown-list');
         let content = "<textarea class=\"form-control mb-2 breakdown-input\" type=\"text\"></textarea>";
+        listDOM.insertAdjacentHTML('beforeend', content);
+    }
+
+    function addProject() {
+        let listDOM = document.getElementById('project-list');
+        let content = "<input class=\"form-control mb-2 project-input\" type=\"text\">";
         listDOM.insertAdjacentHTML('beforeend', content);
     }
 
