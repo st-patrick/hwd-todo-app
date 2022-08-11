@@ -148,6 +148,7 @@
         let response = await getJSONdata();
         globalList = response.list;
         globalBreakdownList = response.breakdowns;
+        globalProjectList = response.projects;
         scoreSortRender();
     }
 
@@ -214,8 +215,18 @@
         document.getElementById('countDone').innerHTML = globalDoneCount;
     }
 
+    async function renderProjects() {
+        let listDOM = document.getElementById('project-list');
+        let listHTML = "";
+        for(let item of globalProjectList) {
+            listHTML += "<input class=\"form-control mb-2classNameect-input\" type=\"text\"  value=\"" + item.name + "\" >";
+        }
+        listDOM.innerHTML = listHTML;
+    }
+
     async function renderAll() {
         renderTodos();
+        renderProjects();
 
         let listDOM = document.getElementById('breakdown-list');
         let listHTML = "";
@@ -287,21 +298,26 @@
         }
     }
 
+    function getProjectsFromInputs() {
+        const inputs = document.getElementsByClassName("project-input");
+        globalProjectList = [];
+        for(let input of inputs) {
+            if(input.value != "") {
+                globalProjectList.push({name: input.value});
+            }
+        }
+    }
+
     function getDataFromInputs() {
         getTodosFromInputs();
 
         const breakdowns = document.getElementsByClassName("breakdown-input");
-        console.log(breakdowns);
-
         globalBreakdownList = [];
-
         for(let breakdown of breakdowns) {
             if(breakdown.value != "") {
                 globalBreakdownList.push(breakdown.value);
             }
         }
-
-        console.log(globalBreakdownList);
     }
     
 
@@ -329,10 +345,12 @@
     // then, send them as a json object to our storage provider
     async function saveAll() {
         getDataFromInputs();
+        getProjectsFromInputs();
 
         const body = {
             list: globalList,
-            breakdowns: globalBreakdownList
+            breakdowns: globalBreakdownList,
+            projects: globalProjectList
         };
         const bodyJSON = JSON.stringify(body);
 
