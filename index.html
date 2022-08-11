@@ -44,9 +44,9 @@
 
     <div class="container mt-3 mb-5">
         <div class="row">
-            <div class="d-none d-lg-block col-lg-6 col-xxl-4 text-center">
+            <div class="col-12 offset-md-1 col-md-10 offset-lg-0 col-lg-6 col-xxl-4 text-center mb-3">
                 <h3>Projects</h3>
-                <div id="project-list">
+                <div id="project-list" class="mb-2">
                     <input class="form-control mb-2 project-input" type="text">
                     <input class="form-control mb-2 project-input" type="text">
                     <input class="form-control mb-2 project-input" type="text">
@@ -57,7 +57,7 @@
                     <button class="text-center btn btn-lg btn-primary fw-bold pb-3" onclick="addProject();">new</button>
                 </div>
             </div>
-            <div class="col-12 offset-md-1 col-md-10 offset-lg-0 col-lg-6 col-xxl-4 text-center">
+            <div class="col-12 offset-md-1 col-md-10 offset-lg-0 col-lg-6 col-xxl-4 text-center mb-3">
                 <h3>ToDos</h3>
                 <div id="list">
                     <input class="form-control mb-2 todo-input" type="text">
@@ -68,23 +68,22 @@
                     <input class="form-control mb-2 todo-input" type="text">
                 </div>
                 <div class="mb-2 text-center">
-                    <button class="text-center btn btn-lg btn-primary fw-bold pb-3" onclick="saveAll();">save</button>
                     <button class="text-center btn btn-lg btn-primary fw-bold pb-3" onclick="addTodo();">new</button>
                     <button class="text-center btn btn-lg btn-primary fw-bold pb-3" onclick="sortTodos();">sort</button>
                 </div>
-                <br>
-                <div class="text-center fw-bold" id="count" style="color: white;">
+                <br class="d-none d-xxl-block">
+                <div class="d-none d-xxl-block text-center fw-bold" id="count" style="color: white;">
                     0
                 </div>
-                <br>
-                <div class="" id="done">
+                <br class="d-none d-xxl-block">
+                <div class="d-none d-xxl-block" id="done">
                     hwd DONE something...
                 </div>
-                <div class="text-center fw-bold" id="countDone" style="color: white;">
+                <div class="d-none d-xxl-block text-center fw-bold" id="countDone" style="color: white;">
                     0
                 </div>
             </div>
-            <div class="col-12 offset-md-1 col-md-10 offset-lg-0 col-lg-6 col-xxl-4 text-center">
+            <div class="col-12 offset-md-1 col-md-10 offset-lg-0 col-lg-6 col-xxl-4 text-center mb-3">
                 <h3>Breakdown</h3>
                 <div id="breakdown-list">
                     <textarea class="form-control mb-2 breakdown-input" type="text"></textarea>
@@ -93,13 +92,19 @@
                 <div class="mb-2 text-center">
                     <button class="text-center btn btn-lg btn-primary fw-bold pb-3" onclick="addBreakdown();">new</button>
                 </div>
-
             </div>
         </div>
 
 
         <br><br><br>
 
+        <button class="btn btn-lg rounded-0 py-2 px-4 text-white position-fixed"
+                style="
+                backdrop-filter: blur(10px);
+                background-color: #f76895;
+                box-shadow: 2rem 1.5rem 2rem -4px #f7689588!important;
+                right:5px; bottom:5px; z-index:9;"
+                onclick="saveAll();">SAVE</button>
     </div>
 
     <div class="ios-peek">
@@ -219,7 +224,7 @@
         let listDOM = document.getElementById('project-list');
         let listHTML = "";
         for(let item of globalProjectList) {
-            listHTML += "<input class=\"form-control mb-2classNameect-input\" type=\"text\"  value=\"" + item.name + "\" >";
+            listHTML += "<input class=\"form-control mb-2 project-input\" type=\"text\"  value=\"" + item.name + "\" >";
         }
         listDOM.innerHTML = listHTML;
     }
