@@ -38,7 +38,7 @@
 
     </style>
 
-    <title>Todo list hwd 0</title>
+    <title>ToolDo</title>
 </head>
 <body style="background: linear-gradient(rgb(200, 215, 242), rgb(183, 199, 227), rgb(166, 184, 212), rgb(149, 169, 197), rgb(133, 154, 182));">
 
@@ -98,7 +98,8 @@
 
         <br><br><br>
 
-        <button class="btn btn-lg rounded-0 py-2 px-4 text-white position-fixed"
+        <button id="save-button"
+				class="btn btn-lg rounded-0 py-2 px-4 text-white position-fixed"
                 style="
                 backdrop-filter: blur(10px);
                 background-color: #f76895;
@@ -129,13 +130,16 @@
     }
 
     async function thatFetchStuff(request) {
-        let responseObject = {};
+        let responseObject = "connection failed"; // default to error, will be replaced by data
 
         await fetch(request)
             .then(response => {
                 if (response.status === 200) {
+					console.log(response);
                     return response.json();
                 } else {
+					console.log("response not 200");
+					return "result not 200";
                     throw new Error('Something went wrong on api server!');
                 }
             })
@@ -143,6 +147,7 @@
                 responseObject = response;
                 // ...
             }).catch(error => {
+				
                 console.error(error);
             });
 
@@ -349,6 +354,10 @@
     // first, get the data from the html inputs
     // then, send them as a json object to our storage provider
     async function saveAll() {
+		// indicate processing of save data ...
+		saveButton = document.getElementById('save-button');
+		saveButton.innerHTML = "..."
+	
         getDataFromInputs();
         getProjectsFromInputs();
 
@@ -365,7 +374,22 @@
             headers: {'Authorization': 'Bearer PhKqhyh2LEhtBbRPLABwB7pq'}
         });
 
-        thatFetchStuff(request);
+        const response = await thatFetchStuff(request);
+		if (response == "result not 200" || response == "connection failed") {
+			saveButton.style.backgroundColor = "red";
+			saveButton.innerHTML = "not saved";
+		} else {
+			saveButton.style.backgroundColor = "green";
+			saveButton.innerHTML = "saved";
+			setTimeout(() => { 
+					saveButton = document.getElementById('save-button');
+					saveButton.style.backgroundColor = "#f76895";
+					saveButton.innerHTML = "SAVE"; 
+				}, 2000);
+		}
+		
+		console.log("asasfdsaf")
+		console.log(response);
     }
 
     // add listener for CTRL+S save shortcut
