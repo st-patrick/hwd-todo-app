@@ -6,13 +6,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
 
-    <meta name="theme-color" content="rgb(200, 215, 242)">
-    <meta name="theme-color" content="rgb(133, 154, 182)" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="rgb(200, 215, 242)" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="lightgoldenrodyellow">
+    <meta name="theme-color" content="lightgoldenrodyellow" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="lightgoldenrodyellow" media="(prefers-color-scheme: dark)">
+	
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+	<meta name="viewport" content="minimal-ui">
+	<meta name="viewport" content="initial-scale=1"> 
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"> 
+	<meta name="mobile-web-app-capable" content="yes">
+	<link rel="manifest" href="/app.webmanifest">
 
     <style>
+		:root {
+			/* blue goofy theme
+			--input-padding: .5rem 1.5rem;
+			--input-background: cornflowerblue;
+			--input-weight: 500;
+			--input-size: 1.1rem;
+			--input-color: white;
+			--background: lightgoldenrodyellow;
+			*/
+		  
+			/* gray serious theme */
+			--input-padding: .7rem 1rem .8rem 1rem;
+			--input-background: lightgray;
+			--input-weight: 490;
+			--input-size: 0.85rem;
+			--input-color: black;
+			--background: white;
+		}
+	
+		body::-webkit-scrollbar{
+			display: none;
+		}
+		textarea::-webkit-scrollbar{
+			display: none;
+		}
+	
         .todo-input {
         }
 
@@ -27,7 +60,7 @@
             z-index: -1;
             bottom: 0;
             left: 0;
-            background: linear-gradient(rgb(200, 215, 242), rgb(183, 199, 227), rgb(166, 184, 212), rgb(149, 169, 197), rgb(133, 154, 182));
+            background: var(--background);
             height: 100vh;
             width: 100vw;
         }
@@ -35,17 +68,32 @@
         textarea {
             height: 200px;
         }
+		
+		.form-control {
+			padding: var(--input-padding);
+			font-size: var(--input-size);
+			font-weight: var(--input-weight);
+			color: var(--input-color);
+			background-color: var(--input-background);
+			border: none;
+			border-radius: .55rem;
+			transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+		}
+		
+		.heading {
+			font-weight: bold;
+		}
 
     </style>
 
     <title>ToolDo</title>
 </head>
-<body style="background: linear-gradient(rgb(200, 215, 242), rgb(183, 199, 227), rgb(166, 184, 212), rgb(149, 169, 197), rgb(133, 154, 182));">
+<body style="background: var(--background);">
 
     <div class="container mt-3 mb-5">
         <div class="row">
-            <div class="col-12 offset-md-1 col-md-10 offset-lg-0 col-lg-6 col-xxl-4 text-center mb-3">
-                <h3>Projects</h3>
+            <div class="col-12 offset-md-1 col-md-10 offset-lg-0 col-lg-6 col-xxl-4 mb-3">
+                <p class="heading">Projects</p>
                 <div id="project-list" class="mb-2">
                     <input class="form-control mb-2 project-input" type="text">
                     <input class="form-control mb-2 project-input" type="text">
@@ -54,11 +102,11 @@
                     <input class="form-control mb-2 project-input" type="text">
                 </div>
                 <div class="mb-2 text-center">
-                    <button class="text-center btn btn-lg btn-primary fw-bold pb-3" onclick="addProject();">new</button>
+                    <span class="fw-bold pb-3" onclick="addProject();">+ Add Project</button>
                 </div>
             </div>
-            <div class="col-12 offset-md-1 col-md-10 offset-lg-0 col-lg-6 col-xxl-4 text-center mb-3">
-                <h3>ToDos</h3>
+            <div class="col-12 offset-md-1 col-md-10 offset-lg-0 col-lg-6 col-xxl-4 mb-3">
+                <p class="heading">ToDos</p>
                 <div id="list">
                     <input class="form-control mb-2 todo-input" type="text">
                     <input class="form-control mb-2 todo-input" type="text">
@@ -68,8 +116,8 @@
                     <input class="form-control mb-2 todo-input" type="text">
                 </div>
                 <div class="mb-2 text-center">
-                    <button class="text-center btn btn-lg btn-primary fw-bold pb-3" onclick="addTodo();">new</button>
-                    <button class="text-center btn btn-lg btn-primary fw-bold pb-3" onclick="sortTodos();">sort</button>
+                    <span class="fw-bold pb-3" onclick="addTodo();">+ Add ToDo</span>
+                    
                 </div>
                 <br class="d-none d-xxl-block">
                 <div class="d-none d-xxl-block text-center fw-bold" id="count" style="color: white;">
@@ -83,14 +131,14 @@
                     0
                 </div>
             </div>
-            <div class="col-12 offset-md-1 col-md-10 offset-lg-0 col-lg-6 col-xxl-4 text-center mb-3">
-                <h3>Breakdown</h3>
+            <div class="col-12 offset-md-1 col-md-10 offset-lg-0 col-lg-6 col-xxl-4 mb-3">
+                <p class="heading">Breakdown</p>
                 <div id="breakdown-list">
                     <textarea class="form-control mb-2 breakdown-input" type="text"></textarea>
                     <textarea class="form-control mb-2 breakdown-input" type="text"></textarea>
                 </div>
                 <div class="mb-2 text-center">
-                    <button class="text-center btn btn-lg btn-primary fw-bold pb-3" onclick="addBreakdown();">new</button>
+                    <span class="fw-bold pb-3" onclick="addBreakdown();">+ Add Breakdown</span>
                 </div>
             </div>
         </div>
@@ -99,13 +147,21 @@
         <br><br><br>
 
         <button id="save-button"
-				class="btn btn-lg rounded-0 py-2 px-4 text-white position-fixed"
-                style="
-                backdrop-filter: blur(10px);
-                background-color: #f76895;
-                box-shadow: 2rem 1.5rem 2rem -4px #f7689588!important;
-                right:5px; bottom:5px; z-index:9;"
-                onclick="saveAll();">SAVE</button>
+				class="btn btn-lg rounded-0 py-2 px-3 text-white position-fixed"
+                style="background-color: black;
+    box-shadow: .1rem .1rem 0.1rem 0px black!important;
+    right: 5px;
+    bottom: 5px;
+    z-index: 9;"
+                onclick="saveAll();">
+							
+			<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-server" viewBox="0 0 16 16">
+			  <path d="M1.333 2.667C1.333 1.194 4.318 0 8 0s6.667 1.194 6.667 2.667V4c0 1.473-2.985 2.667-6.667 2.667S1.333 5.473 1.333 4V2.667z"/>
+			  <path d="M1.333 6.334v3C1.333 10.805 4.318 12 8 12s6.667-1.194 6.667-2.667V6.334a6.51 6.51 0 0 1-1.458.79C11.81 7.684 9.967 8 8 8c-1.966 0-3.809-.317-5.208-.876a6.508 6.508 0 0 1-1.458-.79z"/>
+			  <path d="M14.667 11.668a6.51 6.51 0 0 1-1.458.789c-1.4.56-3.242.876-5.21.876-1.966 0-3.809-.316-5.208-.876a6.51 6.51 0 0 1-1.458-.79v1.666C1.333 14.806 4.318 16 8 16s6.667-1.194 6.667-2.667v-1.665z"/>
+			</svg>
+				
+		</button>
     </div>
 
     <div class="ios-peek">
@@ -360,6 +416,7 @@
 	
         getDataFromInputs();
         getProjectsFromInputs();
+		sortTodos();
 
         const body = {
             list: globalList,
