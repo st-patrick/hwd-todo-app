@@ -83,6 +83,33 @@
 		.heading {
 			font-weight: bold;
 		}
+		
+		.textarea-highlighter {
+			height: 33px;
+			background: red;
+			z-index: 99999999;
+			margin-bottom: -33px;
+			position: relative;
+			mix-blend-mode: plus-lighter;
+		}
+		
+		.project-highlighter {
+			height: 44px;
+			position: absolute;
+			width: 44px;
+			background: red;
+			mix-blend-mode: color;
+		}
+		
+		/*
+		
+		colors that work well for mix-blend-mode: color
+		#b94
+		#1cee
+		#153f
+		#838
+		
+		*/
 
     </style>
 
@@ -147,12 +174,15 @@
         <br><br><br>
 
         <button id="save-button"
-				class="btn btn-lg rounded-0 py-2 px-3 text-white position-fixed"
-                style="background-color: black;
-    box-shadow: .1rem .1rem 0.1rem 0px black!important;
-    right: 5px;
-    bottom: 5px;
-    z-index: 9;"
+				class="btn btn-lg pt-2 pb-3 px-3 text-white position-fixed"
+                style="
+					background-color: #00000055;
+					backdrop-filter: blur(5px);
+					box-shadow: .1rem .1rem 0.1rem 0px black!important;
+					right: 5px;
+					border-radius: 5px;
+					bottom: 10px;
+					z-index: 9;"
                 onclick="saveAll();">
 							
 			<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-server" viewBox="0 0 16 16">
@@ -178,6 +208,25 @@
     let globalProjectList = [];
     let globalTodoCount = 0;
     let globalDoneCount = 0;
+	
+	// other helpers
+	const randomColor = () => Math.floor(Math.random()*16770).toString(16);
+	
+	//templates
+	const todoTemplate = (name) => `
+		<div class="position-relative">
+			<input class="form-control mb-2 todo-input" type="text" placeholder="type here" value="${name}">
+			<span class="position-absolute top-50 translate-middle badge" style="
+				right: -19px;
+				background-color: #` + randomColor() + `;
+				mix-blend-mode: hard-light;
+				backdrop-filter: blur(3px);
+				padding-bottom: 7px;
+			">Finance</span>
+		</div>`;
+		
+
+	
 
     async function getJSONdata() {
         const request = new Request('https://api.npoint.io/09f00b9000d1a3a5902a', {method: 'GET'});
@@ -240,19 +289,19 @@
 
     function addTodo(){
         let listDOM = document.getElementById('list');
-        let content = "<input class=\"form-control mb-2 todo-input\" type=\"text\" placeholder=\"type here\">";
+        let content = todoTemplate("");
         listDOM.insertAdjacentHTML('beforeend', content);
     }
 
     function addBreakdown() {
         let listDOM = document.getElementById('breakdown-list');
-        let content = "<textarea class=\"form-control mb-2 breakdown-input\" type=\"text\"></textarea>";
+        let content = `<div class="textarea-highlighter"></div><textarea class=\"form-control mb-2 breakdown-input\" type=\"text\"></textarea>`;
         listDOM.insertAdjacentHTML('beforeend', content);
     }
 
     function addProject() {
         let listDOM = document.getElementById('project-list');
-        let content = "<input class=\"form-control mb-2 project-input\" type=\"text\">";
+        let content = `<div class="project-highlighter"></div><input class=\"form-control mb-2 project-input\" type=\"text\">`;
         listDOM.insertAdjacentHTML('beforeend', content);
     }
 
@@ -269,7 +318,7 @@
             if (todo.score < 0) {
                 doneHTML += "<p>" + todo.name + "</p>";
             } else {
-                listHTML += "<input class=\"form-control mb-2 todo-input\" type=\"text\" value=\"" + todo.name + "\" aria-label=\"default input example\">";
+                listHTML += todoTemplate(todo.name);
             }
 
         }
@@ -285,7 +334,7 @@
         let listDOM = document.getElementById('project-list');
         let listHTML = "";
         for(let item of globalProjectList) {
-            listHTML += "<input class=\"form-control mb-2 project-input\" type=\"text\"  value=\"" + item.name + "\" >";
+            listHTML += `<div class="project-highlighter" style="background: #`+ randomColor() +`;"></div><input class=\"form-control mb-2 project-input\" type=\"text\"  value=\"` + item.name + `\" >`;
         }
         listDOM.innerHTML = listHTML;
     }
@@ -298,7 +347,7 @@
         let listHTML = "";
 
         for(let breakdown of globalBreakdownList) {
-            listHTML += "<textarea class=\"form-control mb-2 breakdown-input\" type=\"text\">" + breakdown + "</textarea>";
+            listHTML += `<div class="textarea-highlighter" style="background: #`+ randomColor() +`;"></div><textarea class=\"form-control mb-2 breakdown-input\" type=\"text\">` + breakdown + `</textarea>`;
         }
 
         listDOM.innerHTML = listHTML;
@@ -439,9 +488,27 @@
 			saveButton.style.backgroundColor = "green";
 			saveButton.innerHTML = "saved";
 			setTimeout(() => { 
-					saveButton = document.getElementById('save-button');
-					saveButton.style.backgroundColor = "#f76895";
-					saveButton.innerHTML = "SAVE"; 
+					saveButton.outerHTML = `
+        <button id="save-button"
+				class="btn btn-lg pt-2 pb-3 px-3 text-white position-fixed"
+                style="
+					background-color: #00000055;
+					backdrop-filter: blur(5px);
+					box-shadow: .1rem .1rem 0.1rem 0px black!important;
+					right: 5px;
+					border-radius: 5px;
+					bottom: 10px;
+					z-index: 9;"
+                onclick="saveAll();">
+							
+			<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-server" viewBox="0 0 16 16">
+			  <path d="M1.333 2.667C1.333 1.194 4.318 0 8 0s6.667 1.194 6.667 2.667V4c0 1.473-2.985 2.667-6.667 2.667S1.333 5.473 1.333 4V2.667z"/>
+			  <path d="M1.333 6.334v3C1.333 10.805 4.318 12 8 12s6.667-1.194 6.667-2.667V6.334a6.51 6.51 0 0 1-1.458.79C11.81 7.684 9.967 8 8 8c-1.966 0-3.809-.317-5.208-.876a6.508 6.508 0 0 1-1.458-.79z"/>
+			  <path d="M14.667 11.668a6.51 6.51 0 0 1-1.458.789c-1.4.56-3.242.876-5.21.876-1.966 0-3.809-.316-5.208-.876a6.51 6.51 0 0 1-1.458-.79v1.666C1.333 14.806 4.318 16 8 16s6.667-1.194 6.667-2.667v-1.665z"/>
+			</svg>
+				
+		</button>					
+					`; 
 				}, 2000);
 		}
 		
