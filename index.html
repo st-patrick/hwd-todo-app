@@ -101,15 +101,12 @@
 			mix-blend-mode: color;
 		}
 		
-		/*
+		.form-control:focus {
+			border-color: black;
+			box-shadow: 0 0 0 0.2rem black;
+		}
 		
-		colors that work well for mix-blend-mode: color
-		#b94
-		#1cee
-		#153f
-		#838
-		
-		*/
+
 
     </style>
 
@@ -117,10 +114,10 @@
 </head>
 <body style="background: var(--background);">
 
-    <div class="container mt-3 mb-5">
+    <div class="container mt-3 mt-xl-5 mb-5">
         <div class="row">
             <div class="col-12 offset-md-1 col-md-10 offset-lg-0 col-lg-6 col-xxl-4 mb-3">
-                <p class="heading">Projects</p>
+                <p class="heading">| Projects</p>
                 <div id="project-list" class="mb-2">
                     <input class="form-control mb-2 project-input" type="text">
                     <input class="form-control mb-2 project-input" type="text">
@@ -129,11 +126,11 @@
                     <input class="form-control mb-2 project-input" type="text">
                 </div>
                 <div class="mb-2 text-center">
-                    <span class="fw-bold pb-3" onclick="addProject();">+ Add Project</button>
+                    <button class="fw-bold pb-3 border-0 bg-transparent" onclick="addProject();">+ Add Project</button>
                 </div>
             </div>
             <div class="col-12 offset-md-1 col-md-10 offset-lg-0 col-lg-6 col-xxl-4 mb-3">
-                <p class="heading">ToDos</p>
+                <p class="heading">| ToDos</p>
                 <div id="list">
                     <input class="form-control mb-2 todo-input" type="text">
                     <input class="form-control mb-2 todo-input" type="text">
@@ -143,7 +140,7 @@
                     <input class="form-control mb-2 todo-input" type="text">
                 </div>
                 <div class="mb-2 text-center">
-                    <span class="fw-bold pb-3" onclick="addTodo();">+ Add ToDo</span>
+                    <button class="fw-bold pb-3 border-0 bg-transparent" onclick="addTodo();">+ Add ToDo</button>
                     
                 </div>
                 <br class="d-none d-xxl-block">
@@ -159,13 +156,13 @@
                 </div>
             </div>
             <div class="col-12 offset-md-1 col-md-10 offset-lg-0 col-lg-6 col-xxl-4 mb-3">
-                <p class="heading">Breakdown</p>
+                <p class="heading">| Breakdown</p>
                 <div id="breakdown-list">
                     <textarea class="form-control mb-2 breakdown-input" type="text"></textarea>
                     <textarea class="form-control mb-2 breakdown-input" type="text"></textarea>
                 </div>
                 <div class="mb-2 text-center">
-                    <span class="fw-bold pb-3" onclick="addBreakdown();">+ Add Breakdown</span>
+                    <button class="fw-bold pb-3 border-0 bg-transparent" onclick="addBreakdown();">+ Add Breakdown</button>
                 </div>
             </div>
         </div>
@@ -179,9 +176,9 @@
 					background-color: #00000055;
 					backdrop-filter: blur(5px);
 					box-shadow: .1rem .1rem 0.1rem 0px black!important;
-					right: 5px;
+					right: 15px;
 					border-radius: 5px;
-					bottom: 10px;
+					bottom: 15px;
 					z-index: 9;"
                 onclick="saveAll();">
 							
@@ -210,8 +207,27 @@
     let globalDoneCount = 0;
 	
 	// other helpers
-	const randomColor = () => Math.floor(Math.random()*16770).toString(16);
 	
+	// COLORS
+	const randomColor = () => {
+		let color = Math.floor(Math.random()*16777215).toString(16);
+		var zerofilled = ('0000'+color).slice(-6); // good stuff: https://stackoverflow.com/questions/1267283/how-can-i-pad-a-value-with-leading-zeros
+		
+		return zerofilled; // cause otherwise we end up with 4 digit colors that create transparency yadda yadda
+	};
+	const khromaColors = [[70,46,189],[142,103,232],[203,227,115],[175,213,232],[126,206,191],[88,224,81],[223,7,122],[235,252,181],[138,182,202],[22,119,180],[98,232,20],[66,168,98],[30,245,195],[218,33,153],[242,176,190],[23,130,253],[189,249,224],[69,120,115],[219,144,14],[194,236,157],[227,179,58],[61,216,128],[210,28,34],[193,140,25],[154,219,229],[12,85,127],[233,223,231],[183,193,75],[233,145,176],[140,251,192],[152,237,225],[232,126,96],[249,184,152],[200,201,99],[228,236,168],[198,226,20],[34,80,115],[190,148,232],[61,199,227],[190,233,225],[244,230,197],[254,230,77],[71,243,212],[13,186,224],[159,194,176],[164,251,157],[160,227,197],[246,196,32],[53,111,5],[119,175,169]];
+	/*const randomColor = () => {
+		const color = khromaColors[khromaColors.length * Math.random() | 0];
+		return color[0].toString(16) + color[1].toString(16) + color[2].toString(16);
+	};*/
+	// colors that work well for mix-blend-mode: color // Project stripes
+	const mixBlendColor = ["b94", "1cee", "153f", "838", "8c3", "6a4"];
+	// colors that work well for mix-blend-mode: hard-light // Task badges
+	const mixBlendHardLight = ["d4b", "39eb", "2f2d"];
+	// colors that work well for mix-blend-mode: plus-lighter // Breakdown stripes
+	const mixBlendplusLighter = ["14b5"];
+	
+
 	//templates
 	const todoTemplate = (name) => `
 		<div class="position-relative">
@@ -495,9 +511,9 @@
 					background-color: #00000055;
 					backdrop-filter: blur(5px);
 					box-shadow: .1rem .1rem 0.1rem 0px black!important;
-					right: 5px;
+					right: 15px;
 					border-radius: 5px;
-					bottom: 10px;
+					bottom: 15px;
 					z-index: 9;"
                 onclick="saveAll();">
 							
