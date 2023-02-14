@@ -130,7 +130,13 @@
                 </div>
             </div>
             <div class="col-12 offset-md-1 col-md-10 offset-lg-0 col-lg-6 col-xxl-4 mb-3">
-                <p class="heading">| ToDos</p>
+				<div class="d-flex justify-content-between">
+					<p class="heading">| ToDos</p>
+					<div class="form-check form-switch">
+						  <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" onclick="switchSort();">
+						  <label class="form-check-label" for="flexSwitchCheckDefault">sort by time</label>
+					</div>
+				</div>
                 <div id="list">
                     <input class="form-control mb-2 todo-input" type="text">
                     <input class="form-control mb-2 todo-input" type="text">
@@ -205,6 +211,7 @@
     let globalProjectList = [];
     let globalTodoCount = 0;
     let globalDoneCount = 0;
+	let sortByTime = false;
 	
 	// other helpers
 	
@@ -241,8 +248,11 @@
 			">Finance</span>
 		</div>`;
 		
-
-	
+	// switch the sorting
+	function switchSort() {
+		sortByTime = !sortByTime;
+		scoreSortRender(); // update display
+	}
 
     async function getJSONdata() {
         const request = new Request('https://api.npoint.io/09f00b9000d1a3a5902a', {method: 'GET'});
@@ -289,8 +299,14 @@
     }
 
     function scoreSortRender(){
-        scoreTodos();
-        globalList = globalList.sort(compareTodoScore);
+        evaluateAll();
+        
+		if (sortByTime) {
+			globalList = globalList.sort(compareTodoEstimate);
+		} else {
+			globalList = globalList.sort(compareTodoScore);
+		}
+        
         renderAll();
     }
 
@@ -368,7 +384,69 @@
 
         listDOM.innerHTML = listHTML;
     }
+	
+	/*
+	 * next evolutionary step to scoreTodos. evaluate all entities (projects, todos, ...) inside the current window
+	 * 
+	 */
+	function evaluateAll() {
+		scoreTodos();
+		calcTodoTime();
+	}
+	
 
+    /*
+     * assigns each ToDo a value in minutes based on the string after the priority describing the timeframe
+	 * e.g. 30m, 2h, 1-2h, ...
+     */
+    function calcTodoTime() {
+	
+		// get second word from name
+		// check if that word ends with m, h, d, w or m
+		// check if it starts with a number
+		// calculate the number of minutes contained in that expression
+		// if it fails at any point, just assign INTEGER MAX, so basically don't assign any time
+
+		// the conversion factors weeks, days, ...
+		// TODO really the greater units should build on smaller units, so w = 5d, m = 4w etc...
+        const factors = {
+			"m": 1,
+			"h": 60,
+			"d": 480, // now here's the tricky part, a day isn't 24 hours but more like a work day, so 8 hours
+			"w": 2400, // same as above, let's assume a fulltime work schedule
+			// and I guess months don't exist for now? but they should, for projects and what not
+		}
+		
+		
+
+        for(let todo of globalList) {
+		
+			try {
+			
+				const timeString = todo.name.split(' ')[1];
+				// at this point, we could have a time estimate at words[1] or nothing / a letter / a word
+				
+				const factor = factors[timeString.slice(-1)];
+				
+				let amount = timeString.slice(0,-1);
+				
+				// if it's a ballpark, then just make a middle average out of it
+				if (amount.includes("-")) {
+					const extremes = amount.split('-');
+					amount = (parseInt(extremes[1]) + parseInt(extremes[0])) / 2;
+				} 
+				
+				todo.estimate = amount * factor;
+			
+			
+			} catch (error) {
+				todo.estimate = Number.MAX_SAFE_INTEGER;
+			}
+
+        }
+    }
+	
+	
     /*
      * assigns each ToDo a score based on the first letters code
      */
@@ -411,6 +489,9 @@
 
     function compareTodoScore(a, b) {
         return b.score - a.score;
+    }
+    function compareTodoEstimate(a, b) {
+        return b.estimate - a.estimate;
     }
 
     function getTodosFromInputs() {
@@ -528,8 +609,6 @@
 				}, 2000);
 		}
 		
-		console.log("asasfdsaf")
-		console.log(response);
     }
 
     // add listener for CTRL+S save shortcut
