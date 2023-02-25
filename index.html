@@ -228,7 +228,7 @@
 		return color[0].toString(16) + color[1].toString(16) + color[2].toString(16);
 	};*/
 	// colors that work well for mix-blend-mode: color // Project stripes
-	const mixBlendColor = ["b94", "1cee", "153f", "838", "8c3", "6a4"];
+	const mixBlendColor = ["b94", "1cee", "153f", "838", "8c3", "6a4", "c778a6"];
 	// colors that work well for mix-blend-mode: hard-light // Task badges
 	const mixBlendHardLight = ["d4b", "39eb", "2f2d"];
 	// colors that work well for mix-blend-mode: plus-lighter // Breakdown stripes
@@ -236,17 +236,21 @@
 	
 
 	//templates
-	const todoTemplate = (name) => `
-		<div class="position-relative">
+	const todoTemplate = (name = "", color = randomColor(), classes = "") => `
+		<div class="position-relative ${classes}">
 			<input class="form-control mb-2 todo-input" type="text" placeholder="type here" value="${name}">
 			<span class="position-absolute top-50 translate-middle badge" style="
 				right: -19px;
-				background-color: #` + randomColor() + `;
+				background-color: #` + color + `;
 				mix-blend-mode: hard-light;
 				backdrop-filter: blur(3px);
 				padding-bottom: 7px;
 			">Finance</span>
 		</div>`;
+		
+	const projectTemplate = (name = "", color = randomColor(), classes = "") => `
+		<div class="project-highlighter" style="background: #${color};"></div>
+		<input class=\"form-control mb-2 project-input ${classes}\" type=\"text\"  value=\"${name}\" >`;
 		
 	// switch the sorting
 	function switchSort() {
@@ -304,8 +308,10 @@
 		if (sortByTime) {
 			globalList = globalList.sort(compareTodoEstimate);
 		} else {
-			globalList = globalList.sort(compareTodoScore);
+			globalList = globalList.sort(compareScore);
 		}
+		
+		globalProjectList = globalProjectList.sort(compareScore);
         
         renderAll();
     }
@@ -321,7 +327,7 @@
 
     function addTodo(){
         let listDOM = document.getElementById('list');
-        let content = todoTemplate("");
+        let content = todoTemplate();
         listDOM.insertAdjacentHTML('beforeend', content);
     }
 
@@ -333,24 +339,27 @@
 
     function addProject() {
         let listDOM = document.getElementById('project-list');
-        let content = `<div class="project-highlighter"></div><input class=\"form-control mb-2 project-input\" type=\"text\">`;
+        let content = projectTemplate();
         listDOM.insertAdjacentHTML('beforeend', content);
     }
 
 
-    async function renderTodos() {
+    async function renderTodos(filter = "") {
         let listDOM = document.getElementById('list');
         let listHTML = "";
 
         let doneDOM = document.getElementById('done');
         let doneHTML = "";
+		let classes = "";
 
         for(let todo of globalList) {
 
             if (todo.score < 0) {
                 doneHTML += "<p>" + todo.name + "</p>";
             } else {
-                listHTML += todoTemplate(todo.name);
+				classes="";
+				if (filter != "" && !todo.name.includes(filter)) classes = "d-none";
+                listHTML += todoTemplate(todo.name, todo?.color, classes);
             }
 
         }
@@ -362,18 +371,21 @@
         document.getElementById('countDone').innerHTML = globalDoneCount;
     }
 
-    async function renderProjects() {
+    async function renderProjects(filter = "") {
         let listDOM = document.getElementById('project-list');
         let listHTML = "";
+		let classes = "";
         for(let item of globalProjectList) {
-            listHTML += `<div class="project-highlighter" style="background: #`+ randomColor() +`;"></div><input class=\"form-control mb-2 project-input\" type=\"text\"  value=\"` + item.name + `\" >`;
+			classes="";
+			if (filter != "" && !item.name.includes(filter)) classes = "d-none";
+            listHTML += projectTemplate(item.name, item?.color, classes);
         }
         listDOM.innerHTML = listHTML;
     }
 
-    async function renderAll() {
-        renderTodos();
-        renderProjects();
+    async function renderAll(filter = "") {
+        renderTodos(filter);
+        renderProjects(filter);
 
         let listDOM = document.getElementById('breakdown-list');
         let listHTML = "";
@@ -392,6 +404,29 @@
 	function evaluateAll() {
 		scoreTodos();
 		calcTodoTime();
+		
+		scoreProjects();
+		
+		// applies to both projects and todos
+		getColors();
+	}
+	
+	/*
+     * newer feature: allow custom colors in order to show belonging to here or there
+     */
+    function getColors() {
+        for(let todo of globalList) { extractColorFromName(todo); }
+		for(let project of globalProjectList) { extractColorFromName(project); }
+    }
+	
+	// helper function getting colors
+	function extractColorFromName(item) {
+		let colorIndex, color;
+		colorIndex = item.name.indexOf("#");
+		if(colorIndex > -1) {
+			color = item.name.slice(colorIndex + 1, colorIndex + 7);
+			item.color = color;
+		} 
 	}
 	
 
@@ -464,30 +499,45 @@
 
             } else {
 
-                let highImpact = todo.name.charAt(0);
-                let importance = todo.name.charAt(1);
-                let urgency = todo.name.charAt(2);
-
-                if (highImpact != '-') {
-                    highImpact = 100;
-                } else { highImpact = 0; }
-                if (importance != '-') {
-                    importance = 10;
-                } else { importance = 0; }
-                if (urgency != '-') {
-                    urgency = 1;
-                } else { urgency = 0; }
-
-                todo.score = highImpact + importance + urgency;
+                scoreItem(todo);
                 globalTodoCount++;
 
             }
-
         }
-
     }
+	
+	/*
+     * assigns each project a score based on the first letters code
+     */
+    function scoreProjects() {
+        for(let project of globalProjectList) {
+			scoreItem(project);
+        }
+    }
+	
+	/*
+	 * helper to score any item with hwd code inside tring attribute "name"
+	 */
+	function scoreItem(item) {
+		let highImpact = item.name.charAt(0);
+		let importance = item.name.charAt(1);
+		let urgency = item.name.charAt(2);
 
-    function compareTodoScore(a, b) {
+		if (highImpact != '-') {
+		highImpact = 100;
+		} else { highImpact = 0; }
+		if (importance != '-') {
+		importance = 10;
+		} else { importance = 0; }
+		if (urgency != '-') {
+		urgency = 1;
+		} else { urgency = 0; }
+
+		item.score = highImpact + importance + urgency;
+	}
+	 
+
+    function compareScore(a, b) {
         return b.score - a.score;
     }
     function compareTodoEstimate(a, b) {
