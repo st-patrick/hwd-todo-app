@@ -32,7 +32,7 @@
 		  
 			/* gray serious theme */
 			--input-padding: .7rem 1rem .8rem 1rem;
-			--input-background: lightgray;
+			--input-background: #fafafa;
 			--input-weight: 490;
 			--input-size: 0.85rem;
 			--input-color: black;
@@ -78,6 +78,8 @@
 			border: none;
 			border-radius: .55rem;
 			transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+
+			box-shadow: 0 0 0 0.03rem gray;
 		}
 		
 		.heading {
@@ -243,19 +245,16 @@
 	const todoTemplate = (name = "", color = randomPopColor(), classes = "") => `
 		<div class="position-relative ${classes}">
 			<input class="form-control mb-2 todo-input" type="text" placeholder="type here" value="${name}">
-			<span class="position-absolute top-50 translate-middle badge" style="
-				right: -19px;
-				background-color: ` + color + `;
-				mix-blend-mode: hard-light;
-				backdrop-filter: blur(3px);
-				padding-bottom: 7px;
-				box-shadow: 0.1rem .1rem 0.3rem 0.0em rgba(var(--bs-body-color-rgb), 0.3);
-			">Finance</span>
+			${pillTemplate(color)}
 		</div>`;
 		
 	const projectTemplate = (name = "", color = randomPopColor(), classes = "") => `
 		<div class="position-relative ${classes}">
 			<input class=\"form-control mb-2 project-input border-0 ${classes}\" type=\"text\"  value=\"${name}\" >
+			${pillTemplate(color)}
+		</div>`;
+		
+	const pillTemplate = (color = randomPopColor()) => `
 			<span class="position-absolute top-50 translate-middle badge" style="
 				right: -19px;
 				background-color: ` + color + `;
@@ -263,8 +262,8 @@
 				backdrop-filter: blur(3px);
 				padding-bottom: 7px;
 				box-shadow: 0.1rem .1rem 0.3rem 0.0em rgba(var(--bs-body-color-rgb), 0.3);
-			">Finance</span>
-		</div>`;
+			">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+	`;
 		
 	// switch the sorting
 	function switchSort() {
