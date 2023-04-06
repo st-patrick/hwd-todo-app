@@ -116,9 +116,11 @@
 </head>
 <body style="background: var(--background);">
 
+
+
     <div class="container mt-3 mt-xl-5 mb-5">
         <div class="row">
-            <div class="col-12 offset-md-1 col-md-10 offset-lg-0 col-lg-6 col-xxl-4 offset-xxl-1 mb-3">
+            <div class="col-12 offset-md-1 col-md-10 offset-lg-0 col-lg-6 col-xxl-4 offset-xxl-1 mb-3 d-none">
                 <p class="heading">| Projects</p>
                 <div id="project-list" class="mb-2">
                     <input class="form-control mb-2 project-input" type="text">
@@ -131,9 +133,9 @@
                     <button class="fw-bold pb-3 border-0 bg-transparent" onclick="addProject();">+ Add Project</button>
                 </div>
             </div>
-            <div class="col-12 offset-md-1 col-md-10 offset-lg-0 col-lg-6 col-xxl-4 mb-3">
+            <div class="col-12 offset-md-1 col-md-10 offset-lg-0 col-lg-6 col-xxl-4 offset-xxl-4 mb-3">
 				<div class="d-flex justify-content-between">
-					<p class="heading">| ToDos</p>
+					<p class="heading">| Patrick's List</p>
 					<div class="form-check form-switch">
 						  <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" onclick="switchSort();">
 						  <label class="form-check-label" for="flexSwitchCheckDefault">sort by time</label>
@@ -148,7 +150,7 @@
                     <input class="form-control mb-2 todo-input" type="text">
                 </div>
                 <div class="mb-2 text-center">
-                    <button class="fw-bold pb-3 border-0 bg-transparent" onclick="addTodo();">+ Add ToDo</button>
+                    <button class="fw-bold pb-3 border-0 bg-transparent" onclick="addTodo();"><img src="./logo.png" width="45px" /></button>
                     
                 </div>
                 <br class="d-none d-xxl-block">
