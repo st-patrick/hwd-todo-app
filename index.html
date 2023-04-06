@@ -116,7 +116,9 @@
 
     <div class="container mt-3 mt-xl-5 mb-5">
         <div class="row">
-            <div class="col-12 offset-md-1 col-md-10 offset-lg-0 col-lg-6 col-xxl-4 mb-3">
+		
+			<!-- Project section -->
+            <div class="col-12 offset-md-1 col-md-10 offset-lg-0 col-lg-6 col-xxl-4 offset-xxl-1 mb-3">
                 <p class="heading">| Projects</p>
                 <div id="project-list" class="mb-2">
                     <input class="form-control mb-2 project-input" type="text">
@@ -129,6 +131,8 @@
                     <button class="fw-bold pb-3 border-0 bg-transparent" onclick="addProject();">+ Add Project</button>
                 </div>
             </div>
+			
+			<!-- ToDo section -->
             <div class="col-12 offset-md-1 col-md-10 offset-lg-0 col-lg-6 col-xxl-4 mb-3">
 				<div class="d-flex justify-content-between">
 					<p class="heading">| ToDos</p>
@@ -161,16 +165,7 @@
                     0
                 </div>
             </div>
-            <div class="col-12 offset-md-1 col-md-10 offset-lg-0 col-lg-6 col-xxl-4 mb-3">
-                <p class="heading">| Breakdown</p>
-                <div id="breakdown-list">
-                    <textarea class="form-control mb-2 breakdown-input" type="text"></textarea>
-                    <textarea class="form-control mb-2 breakdown-input" type="text"></textarea>
-                </div>
-                <div class="mb-2 text-center">
-                    <button class="fw-bold pb-3 border-0 bg-transparent" onclick="addBreakdown();">+ Add Breakdown</button>
-                </div>
-            </div>
+
         </div>
 
 
@@ -207,7 +202,6 @@
 <script>
 
     let globalList = [];
-    let globalBreakdownList = [];
     let globalProjectList = [];
     let globalTodoCount = 0;
     let globalDoneCount = 0;
@@ -231,9 +225,7 @@
 	const mixBlendColor = ["b94", "1cee", "153f", "838", "8c3", "6a4", "c778a6"];
 	// colors that work well for mix-blend-mode: hard-light // Task badges
 	const mixBlendHardLight = ["d4b", "39eb", "2f2d"];
-	// colors that work well for mix-blend-mode: plus-lighter // Breakdown stripes
-	const mixBlendplusLighter = ["14b5"];
-	
+
 
 	//templates
 	const todoTemplate = (name = "", color = randomColor(), classes = "") => `
@@ -292,7 +284,6 @@
     async function main() {
         let response = await getJSONdata();
         globalList = response.list;
-        globalBreakdownList = response.breakdowns;
         globalProjectList = response.projects;
         scoreSortRender();
     }
@@ -328,12 +319,6 @@
     function addTodo(){
         let listDOM = document.getElementById('list');
         let content = todoTemplate();
-        listDOM.insertAdjacentHTML('beforeend', content);
-    }
-
-    function addBreakdown() {
-        let listDOM = document.getElementById('breakdown-list');
-        let content = `<div class="textarea-highlighter"></div><textarea class=\"form-control mb-2 breakdown-input\" type=\"text\"></textarea>`;
         listDOM.insertAdjacentHTML('beforeend', content);
     }
 
@@ -386,13 +371,6 @@
     async function renderAll(filter = "") {
         renderTodos(filter);
         renderProjects(filter);
-
-        let listDOM = document.getElementById('breakdown-list');
-        let listHTML = "";
-
-        for(let breakdown of globalBreakdownList) {
-            listHTML += `<div class="textarea-highlighter" style="background: #`+ randomColor() +`;"></div><textarea class=\"form-control mb-2 breakdown-input\" type=\"text\">` + breakdown + `</textarea>`;
-        }
 
         listDOM.innerHTML = listHTML;
     }
@@ -572,14 +550,6 @@
 
     function getDataFromInputs() {
         getTodosFromInputs();
-
-        const breakdowns = document.getElementsByClassName("breakdown-input");
-        globalBreakdownList = [];
-        for(let breakdown of breakdowns) {
-            if(breakdown.value != "") {
-                globalBreakdownList.push(breakdown.value);
-            }
-        }
     }
     
 
@@ -616,7 +586,6 @@
 
         const body = {
             list: globalList,
-            breakdowns: globalBreakdownList,
             projects: globalProjectList
         };
         const bodyJSON = JSON.stringify(body);
