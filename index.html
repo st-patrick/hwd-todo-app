@@ -108,6 +108,15 @@
 			box-shadow: 0 0 0 0.2rem black;
 		}
 		
+		.pill {
+			background-color: hsl(55.97678738185304, 70%, 50%);
+			color: black;
+			mix-blend-mode: hard-light;
+			backdrop-filter: blur(3px);
+			padding-bottom: 7px;
+			box-shadow: 0.1rem .1rem 0.3rem 0.0em rgba(var(--bs-body-color-rgb), 0.3);
+		}
+		
 
 
     </style>
@@ -135,23 +144,22 @@
             </div>
             <div class="col-12 offset-md-1 col-md-10 offset-lg-0 col-lg-6 col-xxl-4 offset-xxl-4 mb-3">
 				<div class="d-flex justify-content-between">
-					<p class="heading">| Patrick's List</p>
+					<p class="heading mb-3" contenteditable>| Patrick's List <span class="badge pill">hello there</span></p>
 					<div class="form-check form-switch">
 						  <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" onclick="switchSort();">
 						  <label class="form-check-label" for="flexSwitchCheckDefault">sort by time</label>
 					</div>
 				</div>
                 <div id="list">
-                    <input class="form-control mb-2 todo-input" type="text">
-                    <input class="form-control mb-2 todo-input" type="text">
-                    <input class="form-control mb-2 todo-input" type="text">
-                    <input class="form-control mb-2 todo-input" type="text">
-                    <input class="form-control mb-2 todo-input" type="text">
-                    <input class="form-control mb-2 todo-input" type="text">
+                    <div class="form-control mb-2 todo-input" contenteditable></div>
+                    <div class="form-control mb-2 todo-input" contenteditable></div>
+                    <div class="form-control mb-2 todo-input" contenteditable></div>
+                    <div class="form-control mb-2 todo-input" contenteditable></div>
+                    <div class="form-control mb-2 todo-input" contenteditable></div>
+                    <div class="form-control mb-2 todo-input" contenteditable></div>
                 </div>
                 <div class="mb-2 text-center">
-                    <button class="fw-bold pb-3 border-0 bg-transparent" onclick="addTodo();"><img src="./logo.png" width="45px" /></button>
-                    
+                    <button class="fw-bold pb-3 border-0 bg-transparent mt-1" onclick="addTodo();"><img src="./logo.png" width="45px" /></button>               
                 </div>
                 <br class="d-none d-xxl-block">
                 <div class="d-none text-center fw-bold" id="count" style="color: white;">
@@ -210,6 +218,11 @@
 
 <script>
 
+	// TODO
+	// update render method to convert tags into pills
+	// make an "unrender" method to convert pills into tags. I could use an attribute to store the textual value!
+	//		but then when the actual content is edited... with contenteditable.... it still needs to work
+
     let globalList = [];
     let globalBreakdownList = [];
     let globalProjectList = [];
@@ -228,7 +241,7 @@
 	};
 	const randomPopColor = () => {
 		let hue = (Math.random()*360).toString();
-		return "hsl(" + hue + ", 70%, 50%)"; // cause otherwise we end up with 4 digit colors that create transparency yadda yadda
+		return "hsl(" + hue + ", 70%, 60%)"; // cause otherwise we end up with 4 digit colors that create transparency yadda yadda
 	}
 	const khromaColors = [[70,46,189],[142,103,232],[203,227,115],[175,213,232],[126,206,191],[88,224,81],[223,7,122],[235,252,181],[138,182,202],[22,119,180],[98,232,20],[66,168,98],[30,245,195],[218,33,153],[242,176,190],[23,130,253],[189,249,224],[69,120,115],[219,144,14],[194,236,157],[227,179,58],[61,216,128],[210,28,34],[193,140,25],[154,219,229],[12,85,127],[233,223,231],[183,193,75],[233,145,176],[140,251,192],[152,237,225],[232,126,96],[249,184,152],[200,201,99],[228,236,168],[198,226,20],[34,80,115],[190,148,232],[61,199,227],[190,233,225],[244,230,197],[254,230,77],[71,243,212],[13,186,224],[159,194,176],[164,251,157],[160,227,197],[246,196,32],[53,111,5],[119,175,169]];
 	/*const randomColor = () => {
@@ -246,8 +259,10 @@
 	//templates
 	const todoTemplate = (name = "", color = randomPopColor(), classes = "") => `
 		<div class="position-relative ${classes}">
-			<input class="form-control mb-2 todo-input" type="text" placeholder="type here" value="${name}">
-			${pillTemplate(color)}
+			<div class="form-control mb-2 todo-input" contenteditable spellcheck="false">
+				${name}
+				
+			</div>
 		</div>`;
 		
 	const projectTemplate = (name = "", color = randomPopColor(), classes = "") => `
@@ -257,14 +272,7 @@
 		</div>`;
 		
 	const pillTemplate = (color = randomPopColor()) => `
-			<span class="position-absolute top-50 translate-middle badge" style="
-				right: -19px;
-				background-color: ` + color + `;
-				mix-blend-mode: hard-light;
-				backdrop-filter: blur(3px);
-				padding-bottom: 7px;
-				box-shadow: 0.1rem .1rem 0.3rem 0.0em rgba(var(--bs-body-color-rgb), 0.3);
-			">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+			<span class="badge pill" style="background-color: ` + color + `;">#important</span>
 	`;
 		
 	// switch the sorting
@@ -508,15 +516,11 @@
         for(let todo of globalList) {
 
             if(todo.name.includes("DONE")) {
-
                 todo.score = -1;
                 globalDoneCount++;
-
             } else {
-
                 scoreItem(todo);
                 globalTodoCount++;
-
             }
         }
     }
@@ -564,8 +568,8 @@
         const dones = document.getElementById("done").getElementsByTagName("p");
         globalList = [];
         for(let todo of todoInputs) {
-            if(todo.value != "") {
-                globalList.push({name: todo.value});
+            if(todo.innerHTML.trim() != "") {
+                globalList.push({name: todo.innerHTML});
             }
         }
         for(let done of dones) {
@@ -585,8 +589,9 @@
         }
     }
 
-    function getDataFromInputs() {
+    function scrapeData() {
         getTodosFromInputs();
+		getProjectsFromInputs();
 
         const breakdowns = document.getElementsByClassName("breakdown-input");
         globalBreakdownList = [];
@@ -621,13 +626,13 @@
     // first, get the data from the html inputs
     // then, send them as a json object to our storage provider
     async function saveAll() {
+	
 		// indicate processing of save data ...
 		saveButton = document.getElementById('save-button');
 		saveButton.classList.remove('d-none');
 		saveButton.innerHTML = "..."
 	
-        getDataFromInputs();
-        getProjectsFromInputs();
+        scrapeData();
 		sortTodos();
 
         const body = {
