@@ -113,7 +113,8 @@
 			color: black;
 			mix-blend-mode: hard-light;
 			backdrop-filter: blur(3px);
-			padding-bottom: 7px;
+			padding-bottom: 3px;
+			padding-bottom: 5px;
 			box-shadow: 0.1rem .1rem 0.3rem 0.0em rgba(var(--bs-body-color-rgb), 0.3);
 		}
 		
@@ -257,12 +258,9 @@
 	
 
 	//templates
-	const todoTemplate = (name = "", color = randomPopColor(), classes = "") => `
+	const todoTemplate = (name = "...", color = randomPopColor(), classes = "") => `
 		<div class="position-relative ${classes}">
-			<div class="form-control mb-2 todo-input" contenteditable spellcheck="false">
-				${name}
-				
-			</div>
+			<div class="form-control mb-2 todo-input" contenteditable spellcheck="false">${name} ${pillTemplate(color)}&nbsp;</div>
 		</div>`;
 		
 	const projectTemplate = (name = "", color = randomPopColor(), classes = "") => `
@@ -278,7 +276,7 @@
 	// switch the sorting
 	function switchSort() {
 		sortByTime = !sortByTime;
-		scoreSortRender(); // update display
+		update(); // update display
 	}
 
     async function getJSONdata() {
@@ -317,20 +315,22 @@
         globalList = response.list;
         globalBreakdownList = response.breakdowns;
         globalProjectList = response.projects;
-        scoreSortRender();
+        scoreSortRender(); // because first we have to render only before we can scrape
     }
-
-    function sortTodos() {
-        getTodosFromInputs();
-        scoreSortRender();
-    }
+	
+	function update() {
+		scrapeData();
+		scoreSortRender();
+	}
 
     function scoreSortRender(){
         evaluateAll();
         
 		if (sortByTime) {
+		console.log("sorting by time");
 			globalList = globalList.sort(compareTodoEstimate);
 		} else {
+			console.log("sorting by hwd");
 			globalList = globalList.sort(compareScore);
 		}
 		
@@ -569,6 +569,7 @@
         globalList = [];
         for(let todo of todoInputs) {
             if(todo.innerHTML.trim() != "") {
+				todo.innerHTML = todo.innerHTML.trim(); // 
                 globalList.push({name: todo.innerHTML});
             }
         }
@@ -632,8 +633,7 @@
 		saveButton.classList.remove('d-none');
 		saveButton.innerHTML = "..."
 	
-        scrapeData();
-		sortTodos();
+        update();
 
         const body = {
             list: globalList,
