@@ -115,6 +115,11 @@
 <body style="background: var(--background);">
 
     <div class="container mt-3 mt-xl-5 mb-5">
+		<div class="row mb-3">
+			<div class="col-12 offset-xl-4 col-xl-4">
+				<input id="search" class="form-control mb-2 todo-input" placeholder="search"/>
+			</div>
+		</div>
         <div class="row">
             <div class="col-12 offset-md-1 col-md-10 offset-lg-0 col-lg-6 col-xxl-4 mb-3">
                 <p class="heading">| Projects</p>
@@ -137,6 +142,7 @@
 						  <label class="form-check-label" for="flexSwitchCheckDefault">sort by time</label>
 					</div>
 				</div>
+				
                 <div id="list">
                     <input class="form-control mb-2 todo-input" type="text">
                     <input class="form-control mb-2 todo-input" type="text">
@@ -251,6 +257,15 @@
 	const projectTemplate = (name = "", color = randomColor(), classes = "") => `
 		<div class="project-highlighter" style="background: #${color};"></div>
 		<input class=\"form-control mb-2 project-input ${classes}\" type=\"text\"  value=\"${name}\" >`;
+	
+	
+	const searchDOM = document.getElementById('search');
+	searchDOM.addEventListener("keyup", ({key}) => { // lambda & destructuring of key field of event object
+		if (key === "Enter") {
+			renderAll(searchDOM.value);
+		}
+	})
+		
 		
 	// switch the sorting
 	function switchSort() {
@@ -358,7 +373,7 @@
                 doneHTML += "<p>" + todo.name + "</p>";
             } else {
 				classes="";
-				if (filter != "" && !todo.name.includes(filter)) classes = "d-none";
+				if (filter != "" && !todo.name.toLowerCase().includes(filter.toLowerCase())) classes = "d-none";
                 listHTML += todoTemplate(todo.name, todo?.color, classes);
             }
 
@@ -377,7 +392,7 @@
 		let classes = "";
         for(let item of globalProjectList) {
 			classes="";
-			if (filter != "" && !item.name.includes(filter)) classes = "d-none";
+			if (filter != "" && !item.name.toLowerCase().includes(filter.toLowerCase())) classes = "d-none";
             listHTML += projectTemplate(item.name, item?.color, classes);
         }
         listDOM.innerHTML = listHTML;

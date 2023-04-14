@@ -1,0 +1,8 @@
+{
+  "name": "hwd todo",
+  "short_name": "hwd todo",
+  "display": "standalone",
+  "orientation": "portrait",
+  "start_url": "https://todos.patrickreinbold.com",
+  "scope": "https://todos.patrickreinbold.com"
+}
