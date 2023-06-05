@@ -7,6 +7,8 @@
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+	<link rel="icon" type="image/x-icon" href="logo.png">
+	<link rel="manifest" href="/app.webmanifest">
 
     <meta name="theme-color" content="lightgoldenrodyellow">
     <meta name="theme-color" content="lightgoldenrodyellow" media="(prefers-color-scheme: light)">
@@ -17,7 +19,7 @@
 	<meta name="viewport" content="initial-scale=1"> 
 	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"> 
 	<meta name="mobile-web-app-capable" content="yes">
-	<link rel="manifest" href="/app.webmanifest">
+	
 
     <style>
 		:root {
@@ -121,7 +123,7 @@
 			</div>
 		</div>
         <div class="row">
-            <div class="col-12 offset-md-1 col-md-10 offset-lg-0 col-lg-6 col-xxl-4 mb-3">
+            <div class="order-1 col-12 offset-md-1 col-md-10 order-lg-0 offset-lg-0 col-lg-6 offset-xxl-2 col-xxl-4 mb-3">
                 <p class="heading">| Projects</p>
                 <div id="project-list" class="mb-2">
                     <input class="form-control mb-2 project-input" type="text">
@@ -133,8 +135,19 @@
                 <div class="mb-2 text-center">
                     <button class="fw-bold pb-3 border-0 bg-transparent" onclick="addProject();">+ Add Project</button>
                 </div>
+				
+				<br><br>
+				
+                <p class="heading">| Breakdown</p>
+                <div id="breakdown-list">
+                    <textarea class="form-control mb-2 breakdown-input" type="text"></textarea>
+                    <textarea class="form-control mb-2 breakdown-input" type="text"></textarea>
+                </div>
+                <div class="mb-2 text-center">
+                    <button class="fw-bold pb-3 border-0 bg-transparent" onclick="addBreakdown();">+ Add Breakdown</button>
+                </div>				
             </div>
-            <div class="col-12 offset-md-1 col-md-10 offset-lg-0 col-lg-6 col-xxl-4 mb-3">
+            <div class="order-0 col-12 offset-md-1 col-md-10 order-lg-1 offset-lg-0 col-lg-6 col-xxl-4 mb-3">
 				<div class="d-flex justify-content-between">
 					<p class="heading">| ToDos</p>
 					<div class="form-check form-switch">
@@ -165,16 +178,6 @@
                 </div>
                 <div class="d-none d-xxl-block text-center fw-bold" id="countDone" style="color: white;">
                     0
-                </div>
-            </div>
-            <div class="col-12 offset-md-1 col-md-10 offset-lg-0 col-lg-6 col-xxl-4 mb-3">
-                <p class="heading">| Breakdown</p>
-                <div id="breakdown-list">
-                    <textarea class="form-control mb-2 breakdown-input" type="text"></textarea>
-                    <textarea class="form-control mb-2 breakdown-input" type="text"></textarea>
-                </div>
-                <div class="mb-2 text-center">
-                    <button class="fw-bold pb-3 border-0 bg-transparent" onclick="addBreakdown();">+ Add Breakdown</button>
                 </div>
             </div>
         </div>
@@ -218,6 +221,28 @@
     let globalTodoCount = 0;
     let globalDoneCount = 0;
 	let sortByTime = false;
+	
+	const ENDPOINT = 'https://api.npoint.io/09f00b9000d1a3a5902a'
+	
+	
+	// generic sw
+	window.addEventListener('load', () => {
+	registerSW();
+	});
+	// Register the Service Worker
+	async function registerSW() {
+	if ('serviceWorker' in navigator) {
+		try {
+		await navigator
+				.serviceWorker
+				.register('./sw.js');
+		}
+		catch (e) {
+		console.log('SW registration failed');
+		}
+	}
+	}		
+	
 	
 	// other helpers
 	
@@ -274,7 +299,7 @@
 	}
 
     async function getJSONdata() {
-        const request = new Request('https://api.npoint.io/09f00b9000d1a3a5902a', {method: 'GET'});
+        const request = new Request(ENDPOINT, {method: 'GET'});
 
         return await thatFetchStuff(request);
     }
@@ -605,7 +630,7 @@
             const body = {list: globalList};
             const bodyJSON = JSON.stringify(body);
 
-            const request = new Request('https://api.npoint.io/09f00b9000d1a3a5902a', {
+            const request = new Request(ENDPOINT, {
                 method: 'POST',
                 body: bodyJSON,
                 headers: {'Authorization': 'Bearer PhKqhyh2LEhtBbRPLABwB7pq'}
@@ -636,7 +661,7 @@
         };
         const bodyJSON = JSON.stringify(body);
 
-        const request = new Request('https://api.npoint.io/09f00b9000d1a3a5902a', {
+        const request = new Request(ENDPOINT, {
             method: 'POST',
             body: bodyJSON,
             headers: {'Authorization': 'Bearer PhKqhyh2LEhtBbRPLABwB7pq'}
